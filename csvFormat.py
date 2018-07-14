@@ -1,4 +1,4 @@
-
+import unicodecsv as csv
 with open("index.csv", encoding='utf-8') as f:
     content = f.readlines()
 
@@ -12,9 +12,13 @@ with open("index.csv", encoding='utf-8') as f:
             return True
         except ValueError:
             return False
-
+        content = content.replace('"', '')
     for x in range(len(content)):
-        internalIter = content[x]
+        if x == 0:
+            content[x] = content[x].replace('"', '')
+            content[x+1] = content[x].replace('\n', '') + content[x+1]
+            content[x] = ''
+            print(content[x])
         if x > 0:
             locWords = content[x].split(';')
             #print(locWords)
@@ -57,6 +61,27 @@ with open("index.csv", encoding='utf-8') as f:
                     content[x] = content[x] + locWord2[(z+1)] + locWord2[z+2]
                     #print(content[x])
                     break
+        locWords3 = content[x].split(' ')
+        nameIter = 0;
+        for iZ in range(len(locWords3)):
+            nameIter += 1
+            if(iZ > 0 and iZ < 5):
+                if(is_number(locWords3[iZ])):
+                    locWords3[iZ] = ';' + locWords3[iZ]
+                    break
+        for iX in range(len(locWords3)):
+            if iX == 0:
+                content[x] = locWords3[iX]
+            elif (iX < nameIter):
+                content[x] = content[x] + ' ' + locWords3[iX]
+            else:
+                content[x] = content[x] + ';' + locWords3[iX]
         print(content[x])
 
-
+#append Data to a CSV file
+with open('finalFormatted.csv', 'wb') as csv_file:
+    writer = csv.writer(csv_file, encoding='utf-8')
+    #dictW = csv.DictWriter(csv_file, encoding='utf-8')
+    #dictW.writeheader([headers])
+    for y in range(len(content)):
+        writer.writerow([content[y]])
